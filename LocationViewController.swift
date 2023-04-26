@@ -1,15 +1,25 @@
 import UIKit
 import MapKit
 import CocoaMQTT
+import CoreLocation
 
-class LocationViewController: UIViewController {
+class LocationViewController: UIViewController, CLLocationManagerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     private var mqtt: CocoaMQTT!
+    private let locationManager = CLLocationManager()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupLocationManager()
         setupMQTT()
+    }
+
+    private func setupLocationManager() {
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.startUpdatingLocation()
     }
 
     private func setupMQTT() {
@@ -29,6 +39,13 @@ class LocationViewController: UIViewController {
         let annotation = MKPointAnnotation()
         annotation.coordinate = location
         mapView.addAnnotation(annotation)
+    }
+
+    // CLLocationManagerDelegate method
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last {
+            // Handle location updates, e.g., send location to another device via MQTT
+        }
     }
 }
 
