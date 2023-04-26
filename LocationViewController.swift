@@ -87,7 +87,7 @@ class LocationViewController: UIViewController, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             if geofenceRegion == nil {
-                let geofenceRadius: CLLocationDistance = 100 // radius in meters
+                let geofenceRadius: CLLocationDistance = 25 // radius in meters
                 setupGeofence(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, radius: geofenceRadius)
             }
             // Handle other location updates, e.g., send location to another device via MQTT
