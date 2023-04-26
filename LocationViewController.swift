@@ -24,9 +24,9 @@ class LocationViewController: UIViewController, CLLocationManagerDelegate {
 
     private func setupMQTT() {
         let mqttClientID = "your_client_id"
-        mqtt = CocoaMQTT(clientID: mqttClientID, host: "your_mqtt_server_address", port: your_mqtt_server_port)
-        mqtt.username = "your_mqtt_username"
-        mqtt.password = "your_mqtt_password"
+        mqtt = CocoaMQTT(clientID: mqttClientID, host: "4451d218b08f49b0adf1e5d0357e53e6.s1.eu.hivemq.cloud", port: 8883)
+        mqtt.username = "Snake10"
+        mqtt.password = "quzvy0-xakhaM-peqkyh"
         mqtt.delegate = self
         mqtt.connect()
     }
@@ -51,7 +51,7 @@ class LocationViewController: UIViewController, CLLocationManagerDelegate {
 
 extension LocationViewController: CocoaMQTTDelegate {
     func mqtt(_ mqtt: CocoaMQTT, didConnect host: String, port: Int) {
-        mqtt.subscribe("your_mqtt_topic")
+        mqtt.subscribe("#")
     }
 
     func mqtt(_ mqtt: CocoaMQTT, didReceiveMessage message: CocoaMQTTMessage, id: UInt16) {
