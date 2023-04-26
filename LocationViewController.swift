@@ -3,6 +3,7 @@ import MapKit
 import CocoaMQTT
 import CoreLocation
 import UserNotifications
+import Foundation
 
 class LocationViewController: UIViewController, CLLocationManagerDelegate {
 
@@ -46,7 +47,7 @@ class LocationViewController: UIViewController, CLLocationManagerDelegate {
         
         if let geofenceRegion = geofenceRegion {
             if geofenceRegion.contains(location) == false {
-                locationManager(manager: locationManager, didExitRegion: geofenceRegion)
+                locationManager(locationManager, didExitRegion: geofenceRegion)
             }
         }
     }
@@ -99,27 +100,93 @@ class LocationViewController: UIViewController, CLLocationManagerDelegate {
             sendGeofenceNotification()
         }
     }
+    
+    private func updateMapWith(location: CLLocationCoordinate2D) {
+        // Clear existing annotations
+        mapView.removeAnnotations(mapView.annotations)
+        
+        // Add new annotation for the received location
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = location
+        mapView.addAnnotation(annotation)
+        
+        // Set the map's visible region to include the new location
+        let region = MKCoordinateRegion(center: location, latitudinalMeters: 500, longitudinalMeters: 500)
+        mapView.setRegion(region, animated: true)
+    }
+
+    
 }
 
 extension LocationViewController: CocoaMQTTDelegate {
-    func mqtt(_ mqtt: CocoaMQTT, didConnect host: String, port: Int) {
-        mqtt.subscribe("#")
+    func mqtt(_ mqtt: CocoaMQTT, didUnsubscribeTopics topics: [String]) {
+       
+    }
+
+
+    
+    func mqtt(_ mqtt: CocoaMQTT, didConnectAck ack: CocoaMQTTConnAck) {
+        if ack == .accept {
+            mqtt.subscribe("#")
+        }
+    }
+    
+    func mqtt(_ mqtt: CocoaMQTT, didStateChangeTo state: CocoaMQTTConnState) {
+        // Handle state changes if needed
+    }
+    
+    func mqtt(_ mqtt: CocoaMQTT, didPublishMessage message: CocoaMQTTMessage, id: UInt16) {
+        // Handle published message if needed
+    }
+    
+    func mqtt(_ mqtt: CocoaMQTT, didPublishAck id: UInt16) {
+        // Handle published acknowledgement if needed
+    }
+    
+    
+    func mqtt(_ mqtt: CocoaMQTT, didSubscribeTopics success: NSDictionary, failed: [String]) {
+           //
+        }
+    
+    func mqtt(_ mqtt: CocoaMQTT, didUnsubscribeTopic topic: String) {
+        // Handle unsubscribed topic if needed
+    }
+    
+    func mqttDidPing(_ mqtt: CocoaMQTT) {
+        // Handle ping if needed
+    }
+    
+    func mqttDidReceivePong(_ mqtt: CocoaMQTT) {
+        // Handle pong if needed
+    }
+    
+    func mqttDidDisconnect(_ mqtt: CocoaMQTT, withError err: Error?) {
+        // Handle disconnection if needed
+    }
+    
+    func mqtt(_ mqtt: CocoaMQTT, didReceive trust: SecTrust, completionHandler: @escaping (Bool) -> Void) {
+        // Handle SSL/TLS validation if needed, otherwise just call the completionHandler with true
+        completionHandler(true)
     }
 
     func mqtt(_ mqtt: CocoaMQTT, didReceiveMessage message: CocoaMQTTMessage, id: UInt16) {
-        if let msgString = message.string, let data = msgString.data(using: .utf8) {
-            do {
-                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                    if let lat = json["latitude"] as? Double, let lon = json["longitude"] as? Double {
-                        DispatchQueue.main.async {
-                            self.updateMapLocation(latitude: lat, longitude: lon)
-                        }
-                    }
+        guard let payload = message.string, let data = payload.data(using: .utf8) else {
+            print("Failed to parse message payload.")
+            return
+        }
+        
+        do {
+            if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                if let latitude = json["latitude"] as? CLLocationDegrees, let longitude = json["longitude"] as? CLLocationDegrees {
+                    let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                    updateMapWith(location: location)
+                } else {
+                    print("Failed to parse latitude and longitude from JSON.")
                 }
-            } catch {
-                print("Error parsing JSON: \(error.localizedDescription)")
             }
+        } catch {
+            print("Failed to parse JSON: \(error.localizedDescription)")
         }
     }
+    
 }
-
