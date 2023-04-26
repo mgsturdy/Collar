@@ -20,4 +20,4 @@ note you will need key/string identifiers before these. the read-mes screw this 
 <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 <string>We need your location to display it on the map.</string>
 
-
+make sure you have the "isinitialviewcontroller" ticked for the locationviewcontroller in the storyboard
