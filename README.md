@@ -12,10 +12,12 @@ Set up a Tab Bar Controller with two View Controllers. Assign the classes Locati
 
 Add the following keys to your info.plist file:
 
+note you will need key/string identifiers before these. the read-mes screw this up
 
-#<key>NSLocationWhenInUseUsageDescription</key>
-#<string>We need your location to display it on the map.</string>
-#<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-#<string>We need your location to display it on the map.</string>
+
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>We need your location to display it on the map.</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>We need your location to display it on the map.</string>
 
 
